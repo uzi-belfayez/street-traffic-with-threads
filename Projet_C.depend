@@ -1,0 +1,29 @@
+# depslib dependency file v1.0
+1732379253 source:c:\users\rayen\projet_c\projet_c\utilities.c
+	"jeu.h"
+
+1732377035 source:c:\users\rayen\projet_c\projet_c\jeu.c
+	"jeu.h"
+
+1732378938 c:\users\rayen\projet_c\projet_c\jeu.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<unistd.h>
+	<windows.h>
+	<conio.h>
+	<ncurses.h>
+
+1732374406 source:c:\users\rayen\projet_c\projet_c\main.c
+	<stdio.h>
+	<stdlib.h>
+	"jeu.c"
+	"utilities.c"
+
+1732374373 c:\users\rayen\projet_c\projet_c\jeu.c
+	"jeu.h"
+
+1732375436 c:\users\rayen\projet_c\projet_c\utilities.c
+	"jeu.h"
+
