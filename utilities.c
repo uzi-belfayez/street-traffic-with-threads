@@ -108,7 +108,6 @@ void placer_vehicule(map *m) {
         m->table_de_vehicules[j].x_curr = x;
         m->table_de_vehicules[j].y_curr = y;
         m->map_binary[x][y] = 3;
-        printf("Vehicle %d placed at (%d, %d)\n", j, x, y);
     }
 }
 

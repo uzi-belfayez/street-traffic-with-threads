@@ -16,7 +16,7 @@
 #ifndef DIRECTION_ENUM
 #define DIRECTION_ENUM
 
-enum direction { HAUT, BAS, GAUCHE, DROITE };
+enum direction { UP,DOWN,RIGHT,LEFT };
 #endif
 
 
@@ -41,5 +41,8 @@ typedef struct {
     vehicule *table_de_vehicules;
 } map;
 #endif
+
+void deplacer_vehicule(map *m );
+int valid_vehicule(map *m, int vehicule_index);
 
 #endif // JEU_H
