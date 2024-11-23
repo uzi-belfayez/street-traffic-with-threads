@@ -85,30 +85,31 @@ void print_binary_map(map *m) {
     }
 }
 
-int valid_cordinates(map *m){
-    int i,j;
-    int x = m->table_de_vehicules[i].x_curr ;
-    int y = m->table_de_vehicules[i].y_curr ;
-    for(i = 0 ; i < m->n_veh ; i++){
-                for(j = i+1 ; j < m->n_veh ; j++){
-                    if ( ( (x != m->table_de_vehicules[j].x_curr) || (y != m->table_de_vehicules[j].y_curr ) ) && ( (m->map_binary[x][y] == 1) || (m->map_binary[x][y] == 2) ) )
-                    return 1 ;
-                    else return -1;
-                }
-           }
+int valid_cordinates(map *m, int x, int y) {
+    if (!(m->map_binary[x][y] == 1 || m->map_binary[x][y] == 2)) {
+        return 0;
+    }
+
+    return 1;
 }
 
-void placer_vehicule(map *m){
-    int i = 0;
-    int valid = 0;
-    m->table_de_vehicules = (int *)malloc(m->n_veh * sizeof(int *));
+void placer_vehicule(map *m) {
+    m->table_de_vehicules = (vehicule *)malloc(m->n_veh * sizeof(vehicule));
 
-    do{
-        m->table_de_vehicules[i].x_curr = rand() % (m->n_col + 1);
-        m->table_de_vehicules[i].y_curr = rand() % (m->n_row + 1);
-        valid = valid_cordinates(&m);
-        i++;
-    }while(valid && i<m->n_veh);
+    for (int j = 0; j < m->n_veh; j++) {
+        int valid = 0, x, y;
 
+        do {
+            x = rand() % m->n_row;
+            y = rand() % m->n_col;
+            valid = valid_cordinates(m, x, y);
+        } while (!valid);
+
+        m->table_de_vehicules[j].x_curr = x;
+        m->table_de_vehicules[j].y_curr = y;
+        m->map_binary[x][y] = 3;
+        printf("Vehicle %d placed at (%d, %d)\n", j, x, y);
+    }
 }
+
 
