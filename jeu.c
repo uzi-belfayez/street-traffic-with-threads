@@ -11,9 +11,8 @@ int main(){
 
 
     lire_map("map.txt",&m);
-    afficher_map(m);
-
     generate_binary_map(&m);
+    afficher_map(m);
     print_binary_map(&m);
 
     return 0;
