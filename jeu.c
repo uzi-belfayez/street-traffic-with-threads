@@ -1,7 +1,7 @@
 #include "jeu.h"
 
 
-//checks if the next box is valid or not
+
 int is_path_clear(map *m, int x, int y) {
     int mid_row = m->n_row / 2;
     int mid_col = m->n_col / 2;
@@ -16,7 +16,7 @@ int is_path_clear(map *m, int x, int y) {
     }
     return 0;
 }
-//checks if the road is empty so the vehicule can start to move
+
 int valid_vehicule(map *m, int vehicule_index) {
     int mid_row = m->n_row / 2;
     int mid_col = m->n_col / 2;
@@ -53,38 +53,25 @@ int all_vehicles_out(map *m) {
 }
 
 void move_down(map *m, int vehicule_index) {
-  /*  if (m->table_de_vehicules[vehicule_index].status == 0) {
-        return; // Vehicle is inactive, do nothing
-    }
-*/
+
     int x = m->table_de_vehicules[vehicule_index].x_curr;
     int y = m->table_de_vehicules[vehicule_index].y_curr;
 
-    /*if (x  >= m->n_row ) {
-        m->table_de_vehicules[vehicule_index].status = 0;
-        m->map_binary[x][y] == 1;
-        return;
-    }*/
+
 
     m->table_de_vehicules[vehicule_index].x_curr ++;
 
-    m->map_binary[x][y] = 2;  // Clear old position
+    m->map_binary[x][y] = 2;
     m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y] = 3;
 }
 
 void move_right(map *m, int vehicule_index) {
-   /* if (m->table_de_vehicules[vehicule_index].status == 0) {
-        return;
-    } */
+
 
     int x = m->table_de_vehicules[vehicule_index].x_curr;
     int y = m->table_de_vehicules[vehicule_index].y_curr;
 
-  /*  if (y  >= m->n_col) {
-        m->table_de_vehicules[vehicule_index].status = 0;
-        m->map_binary[x][y] == 1;
-        return;
-    } */
+
 
     m->table_de_vehicules[vehicule_index].y_curr ++;
 
@@ -99,26 +86,26 @@ void deplacer_vehicule_v3(map *m) {
         for (int i = 0; i < m->n_veh; i++) {
 
 
-        while (valid_vehicule(m,i)) { // Move the current vehicle until it exits
-            if (m->table_de_vehicules[i].d == RIGHT) { // If the direction is RIGHT
-                if (m->table_de_vehicules[i].y_curr < m->n_col - 1) { // Check bounds
+        while (valid_vehicule(m,i)) {
+            if (m->table_de_vehicules[i].d == RIGHT) {
+                if (m->table_de_vehicules[i].y_curr < m->n_col - 1) {
                     move_right(m, i);
-                } else { // Vehicle has exited the map
+                } else {
                     m->table_de_vehicules[i].status = 0;
                     m->map_binary[m->table_de_vehicules[i].x_curr][m->table_de_vehicules[i].y_curr] = 1;
                     break;
                 }
             } else if (m->table_de_vehicules[i].d == DOWN) {
-                if (m->table_de_vehicules[i].x_curr < m->n_row - 1) { // Check bounds
+                if (m->table_de_vehicules[i].x_curr < m->n_row - 1) {
                     move_down(m, i);
-                } else { // Vehicle has exited the map
+                } else {
                     m->table_de_vehicules[i].status = 0;
                     m->map_binary[m->table_de_vehicules[i].x_curr][m->table_de_vehicules[i].y_curr] = 2;
                     break;
                 }
             }
-            afficher_map(m); // Update the map display
-            sleep(1); // Pause for visualization
+            afficher_map(m);
+            sleep(1);
         }
 
     }
@@ -150,9 +137,7 @@ int main(){
 
     int v;
     for(int i = 0 ; i <m.n_veh ; i++){
-        //v = valid_vehicule(&m, i);
 
-        //v = is_path_clear(&m,m.table_de_vehicules[i].x_curr,m.table_de_vehicules[i].y_curr);
         v = valid_vehicule(&m,i);
 
         printf("%d", v);
@@ -161,11 +146,5 @@ int main(){
     deplacer_vehicule_v3(&m);
 
 
-   // printf("\n");
-
-
-   // print_binary_map(&m);
-    //clearScreen();
-    //afficher_map(m);
     return 0;
 }
