@@ -55,7 +55,7 @@ int all_vehicles_out(map *m) {
     return 1;
 }
 
-void move_right(map *m, int vehicule_index) {
+void move_down(map *m, int vehicule_index) {
     if (m->table_de_vehicules[vehicule_index].status == 0) {
         return; // Vehicle is inactive, do nothing
     }
@@ -69,15 +69,15 @@ void move_right(map *m, int vehicule_index) {
         return;
     }
 
-    m->table_de_vehicules[vehicule_index].x_prec = x;
-    m->table_de_vehicules[vehicule_index].y_prec = y;
+   // m->table_de_vehicules[vehicule_index].x_prec = x;
+   // m->table_de_vehicules[vehicule_index].y_prec = y;
     m->table_de_vehicules[vehicule_index].x_curr ++;
 
     m->map_binary[x][y] = 0;  // Clear old position
     m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y] = 3;
 }
 
-void move_down(map *m, int vehicule_index) {
+void move_right(map *m, int vehicule_index) {
     if (m->table_de_vehicules[vehicule_index].status == 0) {
         return;
     }
@@ -85,14 +85,14 @@ void move_down(map *m, int vehicule_index) {
     int x = m->table_de_vehicules[vehicule_index].x_curr;
     int y = m->table_de_vehicules[vehicule_index].y_curr;
 
-    if (y + 1 >= m->n_row) {
+    if (y + 1 >= m->n_col) {
         m->table_de_vehicules[vehicule_index].status = 0;
         m->map_binary[x][y] == 1;
         return;
     }
 
-    m->table_de_vehicules[vehicule_index].x_prec = x;
-    m->table_de_vehicules[vehicule_index].y_prec = y;
+   // m->table_de_vehicules[vehicule_index].x_prec = x;
+   // m->table_de_vehicules[vehicule_index].y_prec = y;
     m->table_de_vehicules[vehicule_index].y_curr ++;
 
     m->map_binary[x][y] = 0;  // Clear old position
@@ -105,12 +105,13 @@ void deplacer_vehicule(map *m) {
             if (valid_vehicule(m, i)) {
                 if (m->table_de_vehicules[i].d == RIGHT) {
                     move_right(m, i);
-                } else {
+                } else if(m->table_de_vehicules[i].d == DOWN)   {
                     move_down(m, i);
                 }
                 afficher_map(m);
                 sleep(1);
             }
+
         }
     }
 }
@@ -143,10 +144,10 @@ int main(){
     deplacer_vehicule(&m);
 
 
-    printf("\n");
+   // printf("\n");
 
 
-    print_binary_map(&m);
+   // print_binary_map(&m);
     //clearScreen();
     //afficher_map(m);
     return 0;

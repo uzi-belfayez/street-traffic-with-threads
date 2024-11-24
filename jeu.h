@@ -13,7 +13,7 @@
 #ifndef DIRECTION_ENUM
 #define DIRECTION_ENUM
 
-enum direction { UP,DOWN,RIGHT,LEFT };
+enum direction { DOWN,RIGHT};
 #endif
 
 

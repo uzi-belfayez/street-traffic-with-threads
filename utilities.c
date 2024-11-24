@@ -97,6 +97,9 @@ int valid_cordinates(map *m, int x, int y) {
 }
 
 void placer_vehicule(map *m) {
+    int mid_row = m->n_row / 2;
+    int mid_col = m->n_col / 2;
+
     m->table_de_vehicules = (vehicule *)malloc(m->n_veh * sizeof(vehicule));
 
     for (int j = 0; j < m->n_veh; j++) {
@@ -114,6 +117,11 @@ void placer_vehicule(map *m) {
         m->table_de_vehicules[j].status = 1;
 
         m->map_binary[x][y] = 3;
+
+        if(x == mid_row)
+            m->table_de_vehicules[j].d = RIGHT;
+        else if (y == mid_col)
+            m->table_de_vehicules[j].d = DOWN;
     }
 }
 
