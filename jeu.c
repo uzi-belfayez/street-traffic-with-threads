@@ -128,10 +128,10 @@ void deplacer_vehicule_v3(map *m) {
         int i ;
         int v;
         for (i = 0; i < m->n_veh; i++) {
-        v = valid_vehicule(&m,i);
-        printf("%d", v);
+  //      v = valid_vehicule(&m,i);
+  //      printf("%d", v);
 
-        while (m->table_de_vehicules[i].status == 1) { // Move the current vehicle until it exits
+        while (valid_vehicule(m,i)) { // Move the current vehicle until it exits
             if (m->table_de_vehicules[i].d == RIGHT) { // If the direction is RIGHT
                 if (m->table_de_vehicules[i].y_curr < m->n_col - 1) { // Check bounds
                     move_right(m, i);
