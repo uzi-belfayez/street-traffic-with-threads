@@ -31,7 +31,12 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="main.c">
+		<Unit filename="jeu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jeu.h" />
+		<Unit filename="map.txt" />
+		<Unit filename="utilities.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

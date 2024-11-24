@@ -6,12 +6,9 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#ifdef _WIN32
+#include <pthread.h>
 #include <windows.h>
 #include <conio.h>
-#else
-#include <ncurses.h>
-#endif
 
 #ifndef DIRECTION_ENUM
 #define DIRECTION_ENUM
@@ -28,6 +25,7 @@ typedef struct {
     int x_prec;
     int y_prec;
     enum direction d;
+    int status;
 } vehicule;
 #endif
 
@@ -44,5 +42,12 @@ typedef struct {
 
 void deplacer_vehicule(map *m );
 int valid_vehicule(map *m, int vehicule_index);
+int is_within_bounds(map *m, int x, int y);
+int is_path_clear(map *m, int x, int y);
+int valid_vehicule(map *m, int vehicule_index);
+int all_vehicles_out(map *m);
+void move_right(map *m, int vehicule_index);
+void move_down(map *m, int vehicule_index);
+void deplacer_vehicule(map *m);
 
 #endif // JEU_H

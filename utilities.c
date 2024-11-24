@@ -29,10 +29,13 @@ void lire_map(const char *fichier, map *m) {
 void clearScreen(){
     int n;
     for (n = 0; n < 10; n++)
-        printf( "\n\n\n\n\n\n\n\n\n\n" );
+        printf( "\n" );
 }
 
 void afficher_map(map m){
+
+    clearScreen();
+
     int mid_row = m.n_row / 2;
     int mid_col = m.n_col / 2;
 
@@ -100,13 +103,16 @@ void placer_vehicule(map *m) {
         int valid = 0, x, y;
 
         do {
-            x = rand() % m->n_row;
-            y = rand() % m->n_col;
+            // Ensure the vehicle does not spawn on the borders
+            x = 1 + rand() % (m->n_row - 2);
+            y = 1 + rand() % (m->n_col - 2);
             valid = valid_cordinates(m, x, y);
         } while (!valid);
 
         m->table_de_vehicules[j].x_curr = x;
         m->table_de_vehicules[j].y_curr = y;
+        m->table_de_vehicules[j].status = 1;
+
         m->map_binary[x][y] = 3;
     }
 }
