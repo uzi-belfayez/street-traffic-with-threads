@@ -42,7 +42,6 @@ typedef struct {
 
 void deplacer_vehicule(map *m );
 int valid_vehicule(map *m, int vehicule_index);
-int is_within_bounds(map *m, int x, int y);
 int is_path_clear(map *m, int x, int y);
 int valid_vehicule(map *m, int vehicule_index);
 int all_vehicles_out(map *m);
