@@ -92,44 +92,12 @@ void move_right(map *m, int vehicule_index) {
     m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] = 3;
 }
 
-void deplacer_vehicule(map *m) {
-    while (!all_vehicles_out(m)) {
-        for (int i = 0; i < m->n_veh; i++) {
-            if (valid_vehicule(m, i)) {
-
-                if (m->table_de_vehicules[i].d == RIGHT) {
-                    while(m->table_de_vehicules[i].x_curr < m->n_row){
-                            move_right(m, i);
-                            afficher_map(m);
-                            sleep(1);
-                    }
-
-                } else if(m->table_de_vehicules[i].d == DOWN)   {
-                    while(m->table_de_vehicules[i].y_curr < m->n_col){
-                            move_down(m, i);
-                            afficher_map(m);
-                            sleep(1);
-                    }
-
-                }
-
-            }
-
-
-        }
-    }
-}
-
-
-
 
 void deplacer_vehicule_v3(map *m) {
     while (!all_vehicles_out(m)){
-        int i ;
         int v;
-        for (i = 0; i < m->n_veh; i++) {
-  //      v = valid_vehicule(&m,i);
-  //      printf("%d", v);
+        for (int i = 0; i < m->n_veh; i++) {
+
 
         while (valid_vehicule(m,i)) { // Move the current vehicle until it exits
             if (m->table_de_vehicules[i].d == RIGHT) { // If the direction is RIGHT
@@ -152,8 +120,10 @@ void deplacer_vehicule_v3(map *m) {
             afficher_map(m); // Update the map display
             sleep(1); // Pause for visualization
         }
+
     }
-    i = 0;
+    afficher_map(m);
+    sleep(1);
     }
 
 }

@@ -29,7 +29,7 @@ void lire_map(const char *fichier, map *m) {
 void clearScreen(){
     int n;
     for (n = 0; n < 10; n++)
-        printf( "\n" );
+        printf( "\n\n\n\n\n\n\n" );
 }
 
 void afficher_map(map m){
