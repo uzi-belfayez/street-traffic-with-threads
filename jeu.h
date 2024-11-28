@@ -37,6 +37,8 @@ typedef struct {
     int n_veh;
     int **map_binary;
     vehicule *table_de_vehicules;
+    int n_horiz_routes;
+    int n_vert_routes;
 } map;
 #endif
 

@@ -121,7 +121,8 @@ void deplacer_vehicule_v3(map *m) {
 
 
 int main(){
-
+// PART 1
+/*
     map m ;
     m.n_col = 0;
     m.n_row = 0;
@@ -144,6 +145,22 @@ int main(){
     }
 
     deplacer_vehicule_v3(&m);
+
+*/
+
+// PART 2
+    map m ;
+    m.n_col = 0;
+    m.n_row = 0;
+    m.n_veh = 0;
+
+    srand(time(NULL));
+
+    lire_map_v2("map.txt",&m);
+
+    generate_binary_map_v2(&m);
+    placer_vehicule_v2(&m);
+    afficher_map(m);
 
 
     return 0;

@@ -79,6 +79,7 @@ void generate_binary_map(map *m) {
         }
     }
 }
+
 void print_binary_map(map *m) {
     for (int i = 0; i < m->n_row; i++) {
         for (int j = 0; j < m->n_col; j++) {
@@ -121,6 +122,117 @@ void placer_vehicule(map *m) {
         if(x == mid_row)
             m->table_de_vehicules[j].d = RIGHT;
         else if (y == mid_col)
+            m->table_de_vehicules[j].d = DOWN;
+    }
+}
+
+
+
+
+
+// PART 2
+
+void lire_map_v2(const char *fichier, map *m) {
+    FILE *file = fopen(fichier, "r");
+    if (file == NULL) {
+        perror("Erreur lors de l'ouverture du fichier");
+        exit(EXIT_FAILURE);
+    }
+
+    if (fscanf(file, "%d %d", &m->n_row, &m->n_col) != 2) {
+        printf("Erreur lors de la lecture des dimensions de la carte.\n");
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+    if (fscanf(file, "%d", &m->n_veh) != 1) {
+        printf("Erreur lors de la lecture du nombre de véhicules.\n");
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+
+    if (fscanf(file, "%d %d", &m->n_horiz_routes, &m->n_vert_routes) != 2) {
+        printf("Erreur lors de la lecture des routes horizontales et verticales.\n");
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+    fclose(file);
+}
+
+void generate_binary_map_v2(map *m) {
+
+    m->map_binary = (int **)malloc(m->n_row * sizeof(int *));
+    for (int i = 0; i < m->n_row; i++) {
+        m->map_binary[i] = (int *)malloc(m->n_col * sizeof(int));
+    }
+
+
+    for (int i = 0; i < m->n_row; i++) {
+        for (int j = 0; j < m->n_col; j++) {
+            m->map_binary[i][j] = 0;
+        }
+    }
+
+
+    int horiz_spacing = m->n_row / (m->n_horiz_routes + 1);
+    for (int k = 1; k <= m->n_horiz_routes; k++) {
+        int row = k * horiz_spacing;
+        for (int j = 0; j < m->n_col; j++) {
+            m->map_binary[row][j] = 1;
+        }
+    }
+
+
+    int vert_spacing = m->n_col / (m->n_vert_routes + 1);
+    for (int k = 1; k <= m->n_vert_routes; k++) {
+        int col = k * vert_spacing;
+        for (int i = 0; i < m->n_row; i++) {
+            m->map_binary[i][col] = 2;
+        }
+    }
+}
+
+void placer_vehicule_v2(map *m) {
+
+    m->table_de_vehicules = (vehicule *)malloc(m->n_veh * sizeof(vehicule));
+
+    for (int j = 0; j < m->n_veh; j++) {
+        int valid = 0, x, y;
+
+        do {
+            // Randomly choose a position on the map
+            x = rand() % m->n_row;
+            y = rand() % m->n_col;
+
+            // Ensure the vehicle spawns on a road (horizontal or vertical)
+            if (m->map_binary[x][y] == 1 || m->map_binary[x][y] == 2) {
+                valid = 1;
+
+                // Check if the position is already occupied by another vehicle
+                for (int k = 0; k < j; k++) {
+                    if (m->table_de_vehicules[k].x_curr == x &&
+                        m->table_de_vehicules[k].y_curr == y) {
+                        valid = 0;
+                        break;
+                    }
+                }
+            }
+        } while (!valid);
+
+        // Assign the vehicle's position and initial direction
+        m->table_de_vehicules[j].x_curr = x;
+        m->table_de_vehicules[j].y_curr = y;
+        m->table_de_vehicules[j].status = 1;
+
+
+        m->map_binary[x][y] = 3;
+
+        // Set the initial direction based on the road type
+        if (m->map_binary[x][y] == 1)
+            m->table_de_vehicules[j].d =RIGHT;
+        else if (m->map_binary[x][y] == 2)
             m->table_de_vehicules[j].d = DOWN;
     }
 }
