@@ -29,6 +29,15 @@ typedef struct {
 } vehicule;
 #endif
 
+#ifndef FEU_STRUCT
+#define FEU_STRUCT
+typedef struct {
+    int x;
+    int y;
+    char etat;
+} feu;
+#endif
+
 #ifndef MAP_STRUCT
 #define MAP_STRUCT
 typedef struct {
@@ -39,6 +48,8 @@ typedef struct {
     vehicule *table_de_vehicules;
     int n_horiz_routes;
     int n_vert_routes;
+    int n_feux;
+    feu *feux_positions;
 } map;
 #endif
 
@@ -50,5 +61,6 @@ int all_vehicles_out(map *m);
 void move_right(map *m, int vehicule_index);
 void move_down(map *m, int vehicule_index);
 void deplacer_vehicule(map *m);
+void placer_feux(map *m);
 
 #endif // JEU_H

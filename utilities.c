@@ -36,8 +36,6 @@ void afficher_map(map m){
 
     clearScreen();
 
-    int mid_row = m.n_row / 2;
-    int mid_col = m.n_col / 2;
 
     for (int i = 0; i < m.n_row; i++) {
         for (int j = 0; j < m.n_col; j++) {
@@ -47,6 +45,10 @@ void afficher_map(map m){
                 printf("-");
             else if(m.map_binary[i][j] == 3)
                 printf("*");
+            else if(m.map_binary[i][j] == 4)
+                printf("R");
+            else if(m.map_binary[i][j] == 5)
+                printf("V");
             else printf(" ");
         }
         printf("\n");
@@ -236,5 +238,39 @@ void placer_vehicule_v2(map *m) {
             m->table_de_vehicules[j].d = DOWN;
     }
 }
+
+void placer_feux(map *m) {
+    m->n_feux = 0;
+
+    // Allocate memory for the traffic light positions
+    m->feux_positions = (feu *)malloc(m->n_row * m->n_col * sizeof(feu));
+
+    for (int i = 1; i < m->n_row - 1; i++) {
+        for (int j = 1; j < m->n_col - 1; j++) {
+            // Check if the current point is part of an intersection
+            if ((m->map_binary[i][j] == 1 &&
+                 m->map_binary[i - 1][j] == 2 &&
+                 m->map_binary[i + 1][j] == 2) ||
+                (m->map_binary[i][j] == 2 &&
+                 m->map_binary[i][j - 1] == 1 &&
+                 m->map_binary[i][j + 1] == 1)) {
+
+                // Place a traffic light at this intersection
+                m->map_binary[i-1][j-1] = 4; // Initial state: Red light
+
+                m->feux_positions[m->n_feux].x = i;
+                m->feux_positions[m->n_feux].y = j;
+                m->feux_positions[m->n_feux].etat = 'R'; // Save state in the structure
+
+                m->n_feux++;
+            }
+        }
+    }
+
+    // Adjust memory size to fit the exact number of traffic lights
+    m->feux_positions = realloc(m->feux_positions, m->n_feux * sizeof(feu));
+}
+
+
 
 

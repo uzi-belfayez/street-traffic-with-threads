@@ -160,7 +160,9 @@ int main(){
 
     generate_binary_map_v2(&m);
     placer_vehicule_v2(&m);
+    placer_feux(&m);
     afficher_map(m);
+    print_binary_map(&m);
 
 
     return 0;
