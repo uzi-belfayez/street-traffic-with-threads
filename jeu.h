@@ -10,6 +10,11 @@
 #include <windows.h>
 #include <conio.h>
 
+/*#ifndef MAP_MUTEX
+#define MAP_MUTEX
+pthread_mutex_t map_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif*/
+
 #ifndef DIRECTION_ENUM
 #define DIRECTION_ENUM
 
@@ -50,9 +55,20 @@ typedef struct {
     int n_vert_routes;
     int n_feux;
     feu *feux_positions;
+    pthread_t *threads_feux;
 } map;
 #endif
 
+#ifndef FEU_CONTEXT_STRUCT
+#define FEU_CONTEXT
+typedef struct {
+    feu *light;
+    map *map;
+} feu_context;
+#endif
+
+
+//void afficher_map(map m);
 void deplacer_vehicule(map *m );
 int valid_vehicule(map *m, int vehicule_index);
 int is_path_clear(map *m, int x, int y);
@@ -61,6 +77,7 @@ int all_vehicles_out(map *m);
 void move_right(map *m, int vehicule_index);
 void move_down(map *m, int vehicule_index);
 void deplacer_vehicule(map *m);
-void placer_feux(map *m);
+//void gestion_feu(void *arg);
+//void lancer_threads_feux(map *m);
 
 #endif // JEU_H

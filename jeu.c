@@ -1,6 +1,6 @@
 #include "jeu.h"
 
-
+pthread_mutex_t map_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int is_path_clear(map *m, int x, int y) {
     int mid_row = m->n_row / 2;
@@ -115,9 +115,7 @@ void deplacer_vehicule_v3(map *m) {
 
 }
 
-
-
-
+//PART 2
 
 
 int main(){
@@ -149,20 +147,27 @@ int main(){
 */
 
 // PART 2
-    map m ;
+    map m;
     m.n_col = 0;
     m.n_row = 0;
     m.n_veh = 0;
 
+    pthread_t g_feu;
+
     srand(time(NULL));
 
-    lire_map_v2("map.txt",&m);
+    lire_map_v2("map.txt", &m);
 
     generate_binary_map_v2(&m);
     placer_vehicule_v2(&m);
     placer_feux(&m);
-    afficher_map(m);
-    print_binary_map(&m);
+
+
+
+    afficher_map(&m);
+
+
+    //print_binary_map(&m);
 
 
     return 0;
