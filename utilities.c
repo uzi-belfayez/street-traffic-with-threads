@@ -215,8 +215,9 @@ void placer_vehicule_v2(map *m) {
 
                 // Check if the position is already occupied by another vehicle
                 for (int k = 0; k < j; k++) {
-                    if (m->table_de_vehicules[k].x_curr == x &&
-                        m->table_de_vehicules[k].y_curr == y) {
+                    if ((m->table_de_vehicules[k].x_curr == x &&
+                        m->table_de_vehicules[k].y_curr == y )||
+                        m->map_binary[x][y] == 4 || m->map_binary[x][y] == 5)   {
                         valid = 0;
                         break;
                     }
@@ -229,14 +230,16 @@ void placer_vehicule_v2(map *m) {
         m->table_de_vehicules[j].y_curr = y;
         m->table_de_vehicules[j].status = 1;
 
-
-        m->map_binary[x][y] = 3;
-
         // Set the initial direction based on the road type
         if (m->map_binary[x][y] == 1)
             m->table_de_vehicules[j].d =RIGHT;
         else if (m->map_binary[x][y] == 2)
             m->table_de_vehicules[j].d = DOWN;
+
+
+        m->map_binary[x][y] = 3;
+
+
     }
 }
 

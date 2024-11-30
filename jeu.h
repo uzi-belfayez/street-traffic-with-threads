@@ -56,6 +56,7 @@ typedef struct {
     int n_feux;
     feu *feux_positions;
     pthread_t *threads_feux;
+    pthread_mutex_t lock;
 } map;
 #endif
 
