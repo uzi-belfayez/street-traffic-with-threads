@@ -259,9 +259,9 @@ void placer_feux(map *m) {
                 m->feux_positions[m->n_feux].etat = 'R';
                 // Place a traffic light at this intersection
                 if(m->feux_positions[m->n_feux].etat == 'R')
-                    m->map_binary[i-1][j-1] = 4;
+                    m->map_binary[i][j] = 4;
                 else if(m->feux_positions[m->n_feux].etat == 'V')
-                     m->map_binary[i-1][j-1] = 5;
+                     m->map_binary[i][j] = 5;
 
                 m->feux_positions[m->n_feux].x = i;
                 m->feux_positions[m->n_feux].y = j;
@@ -274,6 +274,11 @@ void placer_feux(map *m) {
     // Adjust memory size to fit the exact number of traffic lights
     m->feux_positions = realloc(m->feux_positions, m->n_feux * sizeof(feu));
 }
+
+
+
+
+
 
 
 
