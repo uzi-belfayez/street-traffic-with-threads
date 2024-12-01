@@ -35,7 +35,6 @@ void clearScreen(){
 void afficher_map(map *m){
 
     clearScreen();
-    //placer_feux(m);
 
     for (int i = 0; i < m->n_row; i++) {
         for (int j = 0; j < m->n_col; j++) {
@@ -205,15 +204,15 @@ void placer_vehicule_v2(map *m) {
         int valid = 0, x, y;
 
         do {
-            // Randomly choose a position on the map
+
             x = rand() % m->n_row;
             y = rand() % m->n_col;
 
-            // Ensure the vehicle spawns on a road (horizontal or vertical)
+
             if (m->map_binary[x][y] == 1 || m->map_binary[x][y] == 2) {
                 valid = 1;
 
-                // Check if the position is already occupied by another vehicle
+
                 for (int k = 0; k < j; k++) {
                     if ((m->table_de_vehicules[k].x_curr == x &&
                         m->table_de_vehicules[k].y_curr == y )||
@@ -225,12 +224,12 @@ void placer_vehicule_v2(map *m) {
             }
         } while (!valid);
 
-        // Assign the vehicle's position and initial direction
+
         m->table_de_vehicules[j].x_curr = x;
         m->table_de_vehicules[j].y_curr = y;
         m->table_de_vehicules[j].status = 1;
 
-        // Set the initial direction based on the road type
+
         if (m->map_binary[x][y] == 1)
             m->table_de_vehicules[j].d =RIGHT;
         else if (m->map_binary[x][y] == 2)
@@ -246,7 +245,7 @@ void placer_vehicule_v2(map *m) {
 void placer_feux(map *m) {
     m->n_feux = 0;
 
-    // Allocate memory for the traffic light positions
+
     m->feux_positions = (feu *)malloc(m->n_row * m->n_col * sizeof(feu));
 
     for (int i = 1; i < m->n_row - 1; i++) {
@@ -260,7 +259,8 @@ void placer_feux(map *m) {
                  (m->map_binary[i][j + 1] == 1 || m->map_binary[i][j + 1] == 3))
                 ) {
                 m->feux_positions[m->n_feux].etat = 'R';
-                // Place a traffic light at this intersection
+
+
                 if(m->feux_positions[m->n_feux].etat == 'R')
                     m->map_binary[i][j] = 4;
                 else if(m->feux_positions[m->n_feux].etat == 'V')
@@ -274,7 +274,7 @@ void placer_feux(map *m) {
         }
     }
 
-    // Adjust memory size to fit the exact number of traffic lights
+
     m->feux_positions = realloc(m->feux_positions, m->n_feux * sizeof(feu));
 }
 

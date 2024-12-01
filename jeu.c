@@ -123,21 +123,35 @@ int valid_vehicule_p2(map *m, int vehicule_index) {
     int x = m->table_de_vehicules[vehicule_index].x_curr;
     int y = m->table_de_vehicules[vehicule_index].y_curr;
 
-    // Vérification si le véhicule quitte la carte
+
     if (x >= m->n_row || y >= m->n_col)
         return 0;
 
     if (m->table_de_vehicules[vehicule_index].d == RIGHT) {
-        if (y + 1 < m->n_col && m->map_binary[x][y + 1] != 3) {
-            return 1; // Mouvement possible
+        if (y + 1 < m->n_col) {
+            if (m->map_binary[x][y + 1] == 4) { // Check for traffic light
+                for (int k = 0; k < m->n_feux; k++) {
+                    if (m->feux_positions[k].x == x && m->feux_positions[k].y == y + 1) {
+                        return m->feux_positions[k].etat == 'V'; // Move only if green
+                    }
+                }
+            }
+            return m->map_binary[x][y + 1] != 3; // Check for road blockage with another vehicule
         }
     } else if (m->table_de_vehicules[vehicule_index].d == DOWN) {
-        if (x + 1 < m->n_row && m->map_binary[x + 1][y] != 3) {
-            return 1; // Mouvement possible
+        if (x + 1 < m->n_row) {
+            if (m->map_binary[x + 1][y] == 4) {
+                for (int k = 0; k < m->n_feux; k++) {
+                    if (m->feux_positions[k].x == x + 1 && m->feux_positions[k].y == y) {
+                        return m->feux_positions[k].etat == 'V';
+                    }
+                }
+            }
+            return m->map_binary[x + 1][y] != 3;
         }
     }
 
-    return 0; // Mouvement bloqué ou hors carte
+    return 0;
 }
 
 
@@ -145,33 +159,47 @@ void move_down_p2(map *m, int vehicule_index) {
     int x = m->table_de_vehicules[vehicule_index].x_curr;
     int y = m->table_de_vehicules[vehicule_index].y_curr;
 
-    // Vérifier si le véhicule quitte la carte
-    if (x + 1 >= m->n_row) {
-        m->map_binary[x][y] = 2; // Trace verticale : '|'
-        return;
-    }
+
+    m->map_binary[x][y] = 2;
+
 
     m->table_de_vehicules[vehicule_index].x_curr++;
 
-    m->map_binary[x][y] = 2; // Libère la position précédente
-    m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y] = 3; // Position actuelle
+
+    if (m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y] == 4 ||
+        m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y] == 5) {
+
+        m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y] = m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y];
+             m->table_de_vehicules[vehicule_index].x_curr++;
+    } else {
+
+        m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y] = 3;
+    }
 }
+
 
 void move_right_p2(map *m, int vehicule_index) {
     int x = m->table_de_vehicules[vehicule_index].x_curr;
     int y = m->table_de_vehicules[vehicule_index].y_curr;
 
-    // Vérifier si le véhicule quitte la carte
-    if (y + 1 >= m->n_col) {
-        m->map_binary[x][y] = 1; // Trace horizontale : '-'
-        return;
-    }
+    m->map_binary[x][y] = 1;
+
 
     m->table_de_vehicules[vehicule_index].y_curr++;
 
-    m->map_binary[x][y] = 1; // Libère la position précédente
-    m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] = 3; // Position actuelle
+
+    if (m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] == 4 ||
+        m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] == 5) {
+
+        m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] =
+            m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr];
+            m->table_de_vehicules[vehicule_index].y_curr++;
+    } else {
+
+        m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] = 3;
+    }
 }
+
 
 
 void *gestion_feu(void *arg) {
@@ -179,13 +207,13 @@ void *gestion_feu(void *arg) {
 
     while (1) {
         pthread_mutex_lock(&feux_mutex); // Lock before modifying state
-        printf("Feu at (%d, %d) is %c. Switching state...\n", f->x, f->y, f->etat);
+    //    printf("Feu at (%d, %d) is %c. Switching state...\n", f->x, f->y, f->etat);
         if (f->etat == 'R') {
-            f->etat = 'V'; // Green
+            f->etat = 'V';
         } else {
-            f->etat = 'R'; // Red
+            f->etat = 'R';
         }
-        printf("Feu at (%d, %d) is now %c.\n", f->x, f->y, f->etat);
+      //  printf("Feu at (%d, %d) is now %c.\n", f->x, f->y, f->etat);
         pthread_mutex_unlock(&feux_mutex); // Unlock after modification
 
         sleep(5); // Wait for 5 seconds before switching again
@@ -195,18 +223,16 @@ void *gestion_feu(void *arg) {
 
 
 void start_feux_threads(map *m) {
-    printf("Creating threads for %d feux...\n", m->n_feux);
+   // printf("Creating threads for %d feux...\n", m->n_feux);
     m->threads_feux = (pthread_t *)malloc(m->n_feux * sizeof(pthread_t));
     if (!m->threads_feux) {
-        printf("Failed to allocate memory for threads_feux.\n");
         exit(1);
     }
 
     for (int i = 0; i < m->n_feux; i++) {
-        printf("Starting thread for feu %d at (%d, %d)\n",
-               i, m->feux_positions[i].x, m->feux_positions[i].y);
+        //printf("Starting thread for feu %d at (%d, %d)\n",
+        //       i, m->feux_positions[i].x, m->feux_positions[i].y);
         if (pthread_create(&m->threads_feux[i], NULL, gestion_feu, (void *)&m->feux_positions[i]) != 0) {
-            printf("Failed to create thread for feu %d\n", i);
             exit(1);
         }
     }
@@ -220,16 +246,16 @@ void afficher_map_v2(map *m) {
 
     for (int i = 0; i < m->n_row; i++) {
         for (int j = 0; j < m->n_col; j++) {
-            char output = ' '; // Default output for empty spaces
+            char output = ' ';
 
             if (m->map_binary[i][j] == 1) {
-                output = '-'; // Horizontal road
+                output = '-';
             } else if (m->map_binary[i][j] == 2) {
-                output = '|'; // Vertical road
+                output = '|';
             } else if (m->map_binary[i][j] == 3) {
-                output = '*'; // Vehicle
-            } else if (m->map_binary[i][j] == 4) { // Check for traffic light
-                // Find the corresponding traffic light in feux_positions
+                output = '*';
+            } else if (m->map_binary[i][j] == 4) {
+
                 for (int k = 0; k < m->n_feux; k++) {
                     if (m->feux_positions[k].x == i && m->feux_positions[k].y == j) {
                         output = m->feux_positions[k].etat; // 'R' or 'V'
@@ -249,8 +275,8 @@ void afficher_map_v2(map *m) {
 
 void *deplacer_vehicule_p2(void *arg) {
     int vehicule_index = *((int *)arg);
-    free(arg); // Free dynamically allocated memory for index
-    printf("Thread started for vehicle %d\n", vehicule_index);
+    free(arg);
+  //  printf("Thread started for vehicle %d\n", vehicule_index);
 
     while (1) {
         pthread_mutex_lock(&m_global.lock); // Lock the map for safe updates
@@ -258,37 +284,48 @@ void *deplacer_vehicule_p2(void *arg) {
         int x = m_global.table_de_vehicules[vehicule_index].x_curr;
         int y = m_global.table_de_vehicules[vehicule_index].y_curr;
 
-        // Arrêter le déplacement si le véhicule est sorti
+
         if (x == -1 || y == -1) {
             pthread_mutex_unlock(&m_global.lock);
             break;
         }
 
-        // Déterminer la direction et tenter le mouvement
+
         if (m_global.table_de_vehicules[vehicule_index].d == RIGHT) {
             if (valid_vehicule_p2(&m_global, vehicule_index)) {
-                move_right(&m_global, vehicule_index);
+                move_right_p2(&m_global, vehicule_index);
             } else {
                 m_global.map_binary[x][y] = 1;
                 pthread_mutex_unlock(&m_global.lock);
-                sleep(1); // Attendre avant de réessayer
+                sleep(1);
                 continue;
             }
         } else if (m_global.table_de_vehicules[vehicule_index].d == DOWN) {
             if (valid_vehicule_p2(&m_global, vehicule_index)) {
-                move_down(&m_global, vehicule_index);
+                move_down_p2(&m_global, vehicule_index);
             } else {
                 m_global.map_binary[x][y] = 2;
                 pthread_mutex_unlock(&m_global.lock);
-                sleep(1); // Attendre avant de réessayer
+                sleep(1);
                 continue;
             }
         }
 
         pthread_mutex_unlock(&m_global.lock);
-        sleep(1); // Ralentir le mouvement pour plus de visibilité
-    }
 
+        sleep(1);
+        //afficher_map_v2(&m_global);
+    }
+    pthread_exit(NULL);
+}
+
+void *update_map_thread(void *arg) {
+    while (1) {
+        pthread_mutex_lock(&m_global.lock); // Lock the map before displaying
+        afficher_map_v2(&m_global);
+        pthread_mutex_unlock(&m_global.lock);
+        sleep(1);
+    }
     pthread_exit(NULL);
 }
 
@@ -303,14 +340,14 @@ void lancer_deplacement(map *m) {
             exit(EXIT_FAILURE);
         }
 
-        *vehicule_index = i; // Pass the vehicle index to the thread
+        *vehicule_index = i;
 
         if (pthread_create(&thread_id, NULL, deplacer_vehicule_p2, vehicule_index) != 0) {
             perror("Failed to create thread");
             exit(EXIT_FAILURE);
         }
 
-        sleep(1); // Delay for 1 second before creating the next thread
+        sleep(1);
     }
 }
 
@@ -366,47 +403,32 @@ int main(){
 */
 
 
- /* printf("%d \n", m.n_feux);
-
-    for (int i = 0 ; i<m.n_feux ; i++){
-        printf("(%d,%d) %c\n",m.feux_positions[i].x,m.feux_positions[i].y,m.feux_positions[i].etat );
-    } */
-
-   /* start_feux_threads(&m);
-
-       while (1) {
-        afficher_map_v2(&m);
-        sleep(1);
-    } */
 
 
-    pthread_t g_feu;
+     pthread_t g_feu, map_thread;
 
     srand(time(NULL));
 
     lire_map_v2("map.txt", &m_global);
-
     generate_binary_map_v2(&m_global);
     placer_feux(&m_global);
     placer_vehicule_v2(&m_global);
     afficher_map_v2(&m_global);
 
-    for(int i = 0 ; i < m_global.n_veh ; i++){
-        printf("%d", m_global.table_de_vehicules[i].d);
+    start_feux_threads(&m_global);
+
+    // Start the map display thread
+    if (pthread_create(&map_thread, NULL, update_map_thread, NULL) != 0) {
+        perror("Failed to create map display thread");
+        exit(EXIT_FAILURE);
     }
 
+    lancer_deplacement(&m_global);
 
-pthread_mutex_init(&m_global.lock, NULL);
-  lancer_deplacement(&m_global);
-
-    while (1) {
-        //printf("entered the while loop \n");
-        system("cls");
-        afficher_map_v2(&m_global);
-        sleep(1);
-        //printf("ended sleeping\n");
-    }
-pthread_mutex_destroy(&m_global.lock);
+    // Wait for all threads
+    pthread_join(map_thread, NULL);
+    pthread_mutex_destroy(&m_global.lock);
 
     return 0;
+
 }
