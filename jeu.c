@@ -119,23 +119,58 @@ void deplacer_vehicule(map *m) {
 
 //PART 2
 
-int valid_vehicule_p2(map *m, int vehicule_index){
+int valid_vehicule_p2(map *m, int vehicule_index) {
     int x = m->table_de_vehicules[vehicule_index].x_curr;
     int y = m->table_de_vehicules[vehicule_index].y_curr;
-    if(y > m->n_col)
-        return 0;
-    if(x > m->n_row)
-        return 0 ;
 
-    if(m->table_de_vehicules[vehicule_index].d == RIGHT ){
-        if(m->map_binary[x][y+1] != 3   )
-            return 1;
+    // Vérification si le véhicule quitte la carte
+    if (x >= m->n_row || y >= m->n_col)
+        return 0;
+
+    if (m->table_de_vehicules[vehicule_index].d == RIGHT) {
+        if (y + 1 < m->n_col && m->map_binary[x][y + 1] != 3) {
+            return 1; // Mouvement possible
+        }
+    } else if (m->table_de_vehicules[vehicule_index].d == DOWN) {
+        if (x + 1 < m->n_row && m->map_binary[x + 1][y] != 3) {
+            return 1; // Mouvement possible
+        }
     }
-    if ( m->table_de_vehicules[vehicule_index].d == DOWN ){
-        if(m->map_binary[x+1][y] != 3)
-            return 1;
+
+    return 0; // Mouvement bloqué ou hors carte
+}
+
+
+void move_down_p2(map *m, int vehicule_index) {
+    int x = m->table_de_vehicules[vehicule_index].x_curr;
+    int y = m->table_de_vehicules[vehicule_index].y_curr;
+
+    // Vérifier si le véhicule quitte la carte
+    if (x + 1 >= m->n_row) {
+        m->map_binary[x][y] = 2; // Trace verticale : '|'
+        return;
     }
-    return 0;
+
+    m->table_de_vehicules[vehicule_index].x_curr++;
+
+    m->map_binary[x][y] = 2; // Libère la position précédente
+    m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y] = 3; // Position actuelle
+}
+
+void move_right_p2(map *m, int vehicule_index) {
+    int x = m->table_de_vehicules[vehicule_index].x_curr;
+    int y = m->table_de_vehicules[vehicule_index].y_curr;
+
+    // Vérifier si le véhicule quitte la carte
+    if (y + 1 >= m->n_col) {
+        m->map_binary[x][y] = 1; // Trace horizontale : '-'
+        return;
+    }
+
+    m->table_de_vehicules[vehicule_index].y_curr++;
+
+    m->map_binary[x][y] = 1; // Libère la position précédente
+    m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] = 3; // Position actuelle
 }
 
 
@@ -223,34 +258,35 @@ void *deplacer_vehicule_p2(void *arg) {
         int x = m_global.table_de_vehicules[vehicule_index].x_curr;
         int y = m_global.table_de_vehicules[vehicule_index].y_curr;
 
-        // Determine direction and attempt movement
-        if (m_global.table_de_vehicules[vehicule_index].d == RIGHT) { // Horizontal route
-            if (valid_vehicule_p2(&m_global, vehicule_index)) {
-                move_right(&m_global, vehicule_index);
-            } else {
-                pthread_mutex_unlock(&m_global.lock);
-                sleep(1); // Wait before retrying
-                continue;
-            }
-        } else if (m_global.table_de_vehicules[vehicule_index].d == DOWN) { // Vertical route
-            if (valid_vehicule_p2(&m_global, vehicule_index)) {
-                move_down(&m_global, vehicule_index);
-                //printf("moved down`n");
-            } else {
-                pthread_mutex_unlock(&m_global.lock);
-                sleep(1); // Wait before retrying
-                continue;
-            }
-        }
-
-        // Check if the vehicle has exited the map
-        if (x >= m_global.n_row || y >= m_global.n_col) {
+        // Arrêter le déplacement si le véhicule est sorti
+        if (x == -1 || y == -1) {
             pthread_mutex_unlock(&m_global.lock);
             break;
         }
 
+        // Déterminer la direction et tenter le mouvement
+        if (m_global.table_de_vehicules[vehicule_index].d == RIGHT) {
+            if (valid_vehicule_p2(&m_global, vehicule_index)) {
+                move_right(&m_global, vehicule_index);
+            } else {
+                m_global.map_binary[x][y] = 1;
+                pthread_mutex_unlock(&m_global.lock);
+                sleep(1); // Attendre avant de réessayer
+                continue;
+            }
+        } else if (m_global.table_de_vehicules[vehicule_index].d == DOWN) {
+            if (valid_vehicule_p2(&m_global, vehicule_index)) {
+                move_down(&m_global, vehicule_index);
+            } else {
+                m_global.map_binary[x][y] = 2;
+                pthread_mutex_unlock(&m_global.lock);
+                sleep(1); // Attendre avant de réessayer
+                continue;
+            }
+        }
+
         pthread_mutex_unlock(&m_global.lock);
-        sleep(1); // Slow down the movement for visibility
+        sleep(1); // Ralentir le mouvement pour plus de visibilité
     }
 
     pthread_exit(NULL);
