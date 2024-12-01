@@ -277,6 +277,46 @@ void placer_feux(map *m) {
 
     m->feux_positions = realloc(m->feux_positions, m->n_feux * sizeof(feu));
 }
+//final
+
+void placer_feux_pf(map *m) {
+    m->n_feux = 0;
+
+    // Allocate memory for the maximum possible number of traffic lights
+    m->feux_positions = (feu *)malloc(m->n_row * m->n_col * sizeof(feu));
+
+    for (int i = 1; i < m->n_row - 1; i++) {
+        for (int j = 1; j < m->n_col - 1; j++) {
+            // Check if the current point is part of an intersection
+            if ((m->map_binary[i][j] == 1 &&
+                 (m->map_binary[i - 1][j] == 2 || m->map_binary[i - 1][j] == 3) &&
+                 (m->map_binary[i + 1][j] == 2 || m->map_binary[i + 1][j] == 3)) ||
+                (m->map_binary[i][j] == 2 &&
+                 (m->map_binary[i][j - 1] == 1 || m->map_binary[i][j - 1] == 3) &&
+                 (m->map_binary[i][j + 1] == 1 || m->map_binary[i][j + 1] == 3))) {
+
+                // Place a traffic light on the vertical edge of the intersection
+                m->feux_positions[m->n_feux].etat = 'R'; // Red
+                m->feux_positions[m->n_feux].x = i-1;  // Above the intersection
+                m->feux_positions[m->n_feux].y = j-1;
+                m->map_binary[i - 1][j-1] = 4; // Mark on the map as vertical light
+                m->n_feux++;
+
+                // Place a traffic light on the horizontal edge of the intersection
+                m->feux_positions[m->n_feux].etat = 'V'; // Blue
+                m->feux_positions[m->n_feux].x = i + 1;
+                m->feux_positions[m->n_feux].y = j + 1; // Left of the intersection
+                m->map_binary[i + 1][j + 1] = 5; // Mark on the map as horizontal light
+                m->n_feux++;
+            }
+        }
+    }
+
+    // Reallocate memory to fit the actual number of traffic lights
+    m->feux_positions = realloc(m->feux_positions, m->n_feux * sizeof(feu));
+}
+
+
 
 
 

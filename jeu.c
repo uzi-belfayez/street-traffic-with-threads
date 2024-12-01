@@ -254,7 +254,7 @@ void afficher_map_v2(map *m) {
                 output = '|';
             } else if (m->map_binary[i][j] == 3) {
                 output = '*';
-            } else if (m->map_binary[i][j] == 4) {
+            } else if (m->map_binary[i][j] == 4 || m->map_binary[i][j] == 5) {
 
                 for (int k = 0; k < m->n_feux; k++) {
                     if (m->feux_positions[k].x == i && m->feux_positions[k].y == j) {
@@ -380,38 +380,64 @@ int main(){
 
 */
 
-// PART 2
-  /*  map m;
-    m.n_col = 0;
-    m.n_row = 0;
-    m.n_veh = 0;
-
-    pthread_t g_feu;
-
-    srand(time(NULL));
-
-    lire_map_v2("map.txt", &m);
-
-    generate_binary_map_v2(&m);
-    placer_feux(&m);
-    placer_vehicule_v2(&m);
-    afficher_map_v2(&m);
-
-    for(int i = 0 ; i < m.n_veh ; i++){
-        printf("%d", m.table_de_vehicules[i].d);
-    }
-*/
 
 
 
 
-     pthread_t g_feu, map_thread;
+//PART2
+  /*   pthread_t g_feu, map_thread;
 
     srand(time(NULL));
 
     lire_map_v2("map.txt", &m_global);
     generate_binary_map_v2(&m_global);
     placer_feux(&m_global);
+    placer_vehicule_v2(&m_global);
+    afficher_map_v2(&m_global);
+
+    start_feux_threads(&m_global);
+
+    // Start the map display thread
+    if (pthread_create(&map_thread, NULL, update_map_thread, NULL) != 0) {
+        perror("Failed to create map display thread");
+        exit(EXIT_FAILURE);
+    }
+
+    lancer_deplacement(&m_global);
+
+    // Wait for all threads
+    pthread_join(map_thread, NULL);
+    pthread_mutex_destroy(&m_global.lock); */
+
+
+    //FINAL
+/*
+pthread_t g_feu, map_thread;
+
+    srand(time(NULL));
+
+    lire_map_v2("map.txt", &m_global);
+    generate_binary_map_v2(&m_global);
+    placer_feux_pf(&m_global);
+    placer_vehicule_v2(&m_global);
+    afficher_map_v2(&m_global);
+    //print_binary_map(m_global);
+    start_feux_threads(&m_global);
+     while (1) {
+        afficher_map_v2(&m_global);
+        sleep(1);
+    }
+    */
+
+    //FINAL FINAL FINAL
+
+    pthread_t g_feu, map_thread;
+
+    srand(time(NULL));
+
+    lire_map_v2("map.txt", &m_global);
+    generate_binary_map_v2(&m_global);
+    placer_feux_pf(&m_global);
     placer_vehicule_v2(&m_global);
     afficher_map_v2(&m_global);
 
