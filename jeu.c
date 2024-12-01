@@ -174,9 +174,9 @@ int valid_vehicule_p2(map *m, int vehicule_index) {
     if (m->table_de_vehicules[vehicule_index].d == RIGHT) {
         if (y + 1 < m->n_col) {
             // Check for a traffic light at the right (horizontal edge of intersection)
-            if (m->map_binary[x - 1][y - 1] == 5) { // Check for horizontal light
+            if (m->map_binary[x - 1][y ] == 5) { // Check for horizontal light
                 for (int k = 0; k < m->n_feux; k++) {
-                    if (m->feux_positions[k].x == x - 1 && m->feux_positions[k].y == y - 1) {
+                    if (m->feux_positions[k].x == x - 1 && m->feux_positions[k].y == y ) {
                         // Move only if the light is green ('V')
                         if (m->feux_positions[k].etat == 'V') {
                             return 1; // Can move
@@ -194,9 +194,9 @@ int valid_vehicule_p2(map *m, int vehicule_index) {
     else if (m->table_de_vehicules[vehicule_index].d == DOWN) {
         if (x - 1 >= 0) {
             // Check for a traffic light below (vertical edge of intersection)
-            if (m->map_binary[x + 1 ][y + 1] == 4) { // Check for vertical light
+            if (m->map_binary[x  ][y + 1] == 4) { // Check for vertical light
                 for (int k = 0; k < m->n_feux; k++) {
-                    if (m->feux_positions[k].x == x +1  && m->feux_positions[k].y == y + 1) {
+                    if (m->feux_positions[k].x == x   && m->feux_positions[k].y == y + 1) {
                         // Move only if the light is green ('V')
                         if (m->feux_positions[k].etat == 'V') {
                             return 1; // Can move
