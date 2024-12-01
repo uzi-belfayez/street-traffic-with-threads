@@ -119,7 +119,15 @@ void deplacer_vehicule(map *m) {
 
 //PART 2
 
-int valid_vehicule_p2(map *m, int vehicule_index) {
+int out_of_bounds(map *m, int x, int y) {
+
+    if (x <= 0 || x >= m->n_row || y <= 0 || y + 1 >= m->n_col) {
+        return 1;
+    }
+    return 0;
+}
+
+int valid_vehicule_p1(map *m, int vehicule_index) {
     int x = m->table_de_vehicules[vehicule_index].x_curr;
     int y = m->table_de_vehicules[vehicule_index].y_curr;
 
@@ -151,6 +159,59 @@ int valid_vehicule_p2(map *m, int vehicule_index) {
         }
     }
 
+    return 0;
+}
+
+int valid_vehicule_p2(map *m, int vehicule_index) {
+    int x = m->table_de_vehicules[vehicule_index].x_curr;
+    int y = m->table_de_vehicules[vehicule_index].y_curr;
+
+    // Check if the vehicle is out of bounds
+    if (x < 0 || x >= m->n_row || y < 0 || y >= m->n_col)
+        return 0;
+
+    // Check if the vehicle is moving to the right
+    if (m->table_de_vehicules[vehicule_index].d == RIGHT) {
+        if (y + 1 < m->n_col) {
+            // Check for a traffic light at the right (horizontal edge of intersection)
+            if (m->map_binary[x - 1][y - 1] == 5) { // Check for horizontal light
+                for (int k = 0; k < m->n_feux; k++) {
+                    if (m->feux_positions[k].x == x - 1 && m->feux_positions[k].y == y - 1) {
+                        // Move only if the light is green ('V')
+                        if (m->feux_positions[k].etat == 'V') {
+                            return 1; // Can move
+                        } else {
+                            return 0; // Cannot move if the light is red ('R')
+                        }
+                    }
+                }
+            }
+            // Check for road blockage with another vehicle (obstruction)
+            return m->map_binary[x][y + 1] != 3; // 3 represents an obstruction (vehicle)
+        }
+    }
+    // Check if the vehicle is moving upwards
+    else if (m->table_de_vehicules[vehicule_index].d == DOWN) {
+        if (x - 1 >= 0) {
+            // Check for a traffic light below (vertical edge of intersection)
+            if (m->map_binary[x + 1 ][y + 1] == 4) { // Check for vertical light
+                for (int k = 0; k < m->n_feux; k++) {
+                    if (m->feux_positions[k].x == x +1  && m->feux_positions[k].y == y + 1) {
+                        // Move only if the light is green ('V')
+                        if (m->feux_positions[k].etat == 'V') {
+                            return 1; // Can move
+                        } else {
+                            return 0; // Cannot move if the light is red ('R')
+                        }
+                    }
+                }
+            }
+            // Check for road blockage with another vehicle (obstruction)
+            return m->map_binary[x - 1][y] != 3; // 3 represents an obstruction (vehicle)
+        }
+    }
+
+    // If no conditions are met, the vehicle cannot move
     return 0;
 }
 
@@ -188,19 +249,24 @@ void move_right_p2(map *m, int vehicule_index) {
     m->table_de_vehicules[vehicule_index].y_curr++;
 
 
-    if (m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] == 4 ||
-        m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] == 5) {
 
-        m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] =
-            m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr];
-            m->table_de_vehicules[vehicule_index].y_curr++;
-    } else {
 
         m->map_binary[x][m->table_de_vehicules[vehicule_index].y_curr] = 3;
-    }
+
 }
 
+void move_up_p2(map *m, int vehicule_index) {
+    int x = m->table_de_vehicules[vehicule_index].x_curr;
+    int y = m->table_de_vehicules[vehicule_index].y_curr;
 
+    m->map_binary[x][y] = 2;  // Reset the current position to road (2)
+
+    m->table_de_vehicules[vehicule_index].x_curr--;  // Move the vehicle up by decrementing the x position
+
+
+        m->map_binary[m->table_de_vehicules[vehicule_index].x_curr][y] = 3;  // Set vehicle (3) at the new position
+
+}
 
 void *gestion_feu(void *arg) {
     feu *f = (feu *)arg;
@@ -294,17 +360,21 @@ void *deplacer_vehicule_p2(void *arg) {
         if (m_global.table_de_vehicules[vehicule_index].d == RIGHT) {
             if (valid_vehicule_p2(&m_global, vehicule_index)) {
                 move_right_p2(&m_global, vehicule_index);
-            } else {
+            }
+            else if (out_of_bounds(&m_global, x , y))
                 m_global.map_binary[x][y] = 1;
+             else {
                 pthread_mutex_unlock(&m_global.lock);
                 sleep(1);
                 continue;
             }
         } else if (m_global.table_de_vehicules[vehicule_index].d == DOWN) {
             if (valid_vehicule_p2(&m_global, vehicule_index)) {
-                move_down_p2(&m_global, vehicule_index);
-            } else {
+                move_up_p2(&m_global, vehicule_index);
+            }
+            else if(out_of_bounds(&m_global, x , y))
                 m_global.map_binary[x][y] = 2;
+             else {
                 pthread_mutex_unlock(&m_global.lock);
                 sleep(1);
                 continue;
@@ -318,6 +388,8 @@ void *deplacer_vehicule_p2(void *arg) {
     }
     pthread_exit(NULL);
 }
+
+
 
 void *update_map_thread(void *arg) {
     while (1) {

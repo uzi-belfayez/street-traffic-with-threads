@@ -297,16 +297,16 @@ void placer_feux_pf(map *m) {
 
                 // Place a traffic light on the vertical edge of the intersection
                 m->feux_positions[m->n_feux].etat = 'R'; // Red
-                m->feux_positions[m->n_feux].x = i-1;  // Above the intersection
-                m->feux_positions[m->n_feux].y = j-1;
-                m->map_binary[i - 1][j-1] = 4; // Mark on the map as vertical light
+                m->feux_positions[m->n_feux].x = i+1;  // Above the intersection
+                m->feux_positions[m->n_feux].y = j+1;
+                m->map_binary[i + 1][j + 1] = 4; // Mark on the map as vertical light
                 m->n_feux++;
 
                 // Place a traffic light on the horizontal edge of the intersection
                 m->feux_positions[m->n_feux].etat = 'V'; // Blue
-                m->feux_positions[m->n_feux].x = i + 1;
-                m->feux_positions[m->n_feux].y = j + 1; // Left of the intersection
-                m->map_binary[i + 1][j + 1] = 5; // Mark on the map as horizontal light
+                m->feux_positions[m->n_feux].x = i - 1;
+                m->feux_positions[m->n_feux].y = j - 1; // Left of the intersection
+                m->map_binary[i - 1][j - 1] = 5; // Mark on the map as horizontal light
                 m->n_feux++;
             }
         }
