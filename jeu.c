@@ -453,6 +453,8 @@ int main() {
         placer_vehicule(&m_global);
         afficher_map(m_global);
 
+       // print_binary_map(m_global);
+
         int v;
         for (int i = 0; i < m_global.n_veh; i++) {
             v = valid_vehicule(&m_global, i);

@@ -92,7 +92,7 @@ void print_binary_map(map *m) {
 }
 
 int valid_cordinates(map *m, int x, int y) {
-    if (!(m->map_binary[x][y] == 1 || m->map_binary[x][y] == 2)) {
+    if (!(m->map_binary[x][y] == 1 || m->map_binary[x][y] == 2 || m->map_binary[x][y] == 3) ) {
         return 0;
     }
 
@@ -277,6 +277,7 @@ void placer_feux(map *m) {
 
     m->feux_positions = realloc(m->feux_positions, m->n_feux * sizeof(feu));
 }
+
 //final
 
 void placer_feux_pf(map *m) {

@@ -60,13 +60,8 @@ typedef struct {
 } map;
 #endif
 
-#ifndef FEU_CONTEXT_STRUCT
-#define FEU_CONTEXT
-typedef struct {
-    feu *light;
-    map *map;
-} feu_context;
-#endif
+
+
 
 
 //void afficher_map(map m);
