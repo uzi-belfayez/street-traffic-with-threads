@@ -5,7 +5,6 @@ The first line represents the height and the width of the grid, the second repre
 
 ![V3](./imgs/C_1.PNG)
 
-If you choose 1, you get : 
 ![V3](./imgs/C_2.PNG)
 
 ![V3](./imgs/C_3.PNG)
